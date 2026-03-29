@@ -1,6 +1,7 @@
 📄 PRODUCT REQUIREMENTS DOCUMENT (PRD)
 
 Sistem POS UMKM Berbasis Web
+
 📌 1. Product Overview
 Nama Produk: KasirKu
 Deskripsi:
