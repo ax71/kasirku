@@ -1,7 +1,5 @@
 import { useState } from "react";
 import ModeToggle from "../../../components/common/mode-toggle";
-import Button from "../../../components/ui/Button";
-import Input from "../../../components/ui/Input/Input";
 import { INITIAL_LOGIN_FORM } from "../../../constants/auth-constans";
 import {
   loginSchema,
@@ -12,6 +10,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import supabase from "../../../lib/supabase";
 import { useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/Button";
 
 const Login = () => {
   const navigate = useNavigate();
