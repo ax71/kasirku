@@ -1,1 +1,155 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/geist";
+
+@custom-variant dark (&:is(.dark *));
+@variant dark (&:where(.dark, .dark *));
+
+@theme {
+  /* Brand Colors */
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  /* Status Colors */
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-destructive: var(--destructive);
+
+  /* UI Base Colors */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+}
+
+:root {
+  /* Indigo Business Palette - Cocok untuk Keuangan/Retail */
+  --background: oklch(0.99 0.005 250);
+  /* Putih dengan sedikit rona biru dingin */
+  --foreground: oklch(0.20 0.04 250);
+  /* Teks utama biru sangat tua (bukan hitam pekat) */
+
+  /* Warna Utama: Indigo/Violet yang elegan */
+  --primary: oklch(0.55 0.18 260);
+  --primary-foreground: oklch(0.99 0 0);
+
+  /* Muted: Untuk area background sidebar atau input */
+  --muted: oklch(0.96 0.01 250);
+  --muted-foreground: oklch(0.45 0.03 250);
+
+  /* Border: Lebih tegas agar struktur card terlihat */
+  --border: oklch(0.90 0.02 250);
+  --input: oklch(0.90 0.02 250);
+
+  /* Status UI POS */
+  --success: oklch(0.65 0.18 150);
+  /* Hijau Kasir (Minty Fresh) */
+  --warning: oklch(0.82 0.16 85);
+  /* Kuning Ambar */
+  --destructive: oklch(0.60 0.20 25);
+  /* Merah Soft */
+
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.20 0.04 250);
+
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.20 0.04 250);
+
+  --secondary: oklch(0.93 0.03 260);
+  --secondary-foreground: oklch(0.40 0.15 260);
+
+  --accent: oklch(0.93 0.03 260);
+  --accent-foreground: oklch(0.40 0.15 260);
+
+  --ring: oklch(0.55 0.18 260);
+  --radius: 0.625rem;
+
+  /* Sidebar khusus POS (Dark Blue Professional) */
+  --sidebar: oklch(0.22 0.04 260);
+  --sidebar-foreground: oklch(0.95 0.01 260);
+  --sidebar-primary: oklch(0.55 0.18 260);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.30 0.05 260);
+  --sidebar-accent-foreground: oklch(0.98 0.01 260);
+  --sidebar-border: oklch(0.30 0.05 260);
+}
+
+.dark {
+  /* Dark Mode: Deep Charcoal (Bukan hitam pekat OLED) */
+  --background: oklch(0.16 0.02 260);
+  --foreground: oklch(0.95 0.01 260);
+
+  --primary: oklch(0.65 0.15 260);
+  /* Lebih terang di dark mode agar kontras */
+  --primary-foreground: oklch(0.16 0.02 260);
+
+  --muted: oklch(0.22 0.03 260);
+  --muted-foreground: oklch(0.70 0.03 260);
+
+  --border: oklch(0.28 0.03 260);
+  --input: oklch(0.28 0.03 260);
+
+  --card: oklch(0.20 0.03 260);
+  --card-foreground: oklch(0.95 0.01 260);
+
+  --popover: oklch(0.20 0.03 260);
+  --popover-foreground: oklch(0.95 0.01 260);
+
+  --secondary: oklch(0.25 0.03 260);
+  --secondary-foreground: oklch(0.95 0.01 260);
+
+  --destructive: oklch(0.55 0.22 25);
+
+  --sidebar: oklch(0.14 0.02 260);
+  --sidebar-foreground: oklch(0.90 0.01 260);
+  --sidebar-border: oklch(0.22 0.03 260);
+}
+
+@theme inline {
+  --font-heading: var(--font-sans);
+  --font-sans: 'Geist Variable', sans-serif;
+  --color-sidebar-ring: var(--ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground transition-colors duration-300;
+  }
+}
