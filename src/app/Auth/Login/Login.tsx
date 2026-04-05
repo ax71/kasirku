@@ -1,17 +1,14 @@
 import { useState } from "react";
-import ModeToggle from "../../../components/common/mode-toggle";
-import { INITIAL_LOGIN_FORM } from "../../../constants/auth-constans";
-import {
-  loginSchema,
-  type LoginForm,
-} from "../../../validations/auth-validation";
+import ModeToggle from "@/components/common/mode-toggle";
+import { INITIAL_LOGIN_FORM } from "@/constants/auth-constans";
+import { loginSchema, type LoginForm } from "@/validations/auth-validation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import supabase from "../../../lib/supabase";
+import supabase from "@/lib/supabase";
 import { useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 
 const Login = () => {
   const navigate = useNavigate();
