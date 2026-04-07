@@ -40,9 +40,7 @@ const Home = () => {
             kasirKU
           </div>
           <div className="flex items-center gap-4">
-            <Button variant="ghost" onClick={() => navigate("/login")}>
-              Sign In
-            </Button>
+            <Button onClick={() => navigate("/login")}>Sign In</Button>
             <ModeToggle />
           </div>
         </div>
