@@ -36,7 +36,7 @@ const Login = () => {
     if (error) {
       setServerError(error.message);
     } else {
-      navigate("/dashboard");
+      navigate("/admin");
     }
 
     setLoading(false);
