@@ -19,7 +19,7 @@ export const SIDEBAR_MENU_LIST = {
     },
     {
       title: "Users",
-      url: "/admin/user",
+      url: "/admin/users",
       icon: Users,
     },
   ],

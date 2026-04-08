@@ -3,6 +3,7 @@ import {
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
+  BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { useLocation } from "react-router-dom";
 import { Fragment } from "react/jsx-runtime";
@@ -27,6 +28,7 @@ const DashboardBreadcrumb = () => {
                 path
               )}
             </BreadcrumbItem>
+            {index < paths.length - 1 && <BreadcrumbSeparator />}
           </Fragment>
         ))}
       </BreadcrumbList>

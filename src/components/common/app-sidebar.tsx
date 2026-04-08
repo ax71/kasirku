@@ -14,7 +14,7 @@ import {
   type SidebarMenuKey,
 } from "@/constants/sidebar-constant";
 import { cn } from "@/lib/utils";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useProfile } from "@/hooks/use-auth";
 import LoadingSidebar from "./loding-sidebar";
 
@@ -51,8 +51,8 @@ export default function AppSidebar() {
                   (item) => (
                     <SidebarMenuItem key={item.title}>
                       <SidebarMenuButton asChild tooltip={item.title}>
-                        <a
-                          href={item.url}
+                        <Link
+                          to={item.url}
                           className={cn("px-4 py-3 h-auto", {
                             "bg-primary text-white hover:bg-primary/80 hover:text-white":
                               pathname === item.url,
@@ -60,7 +60,7 @@ export default function AppSidebar() {
                         >
                           {item.icon && <item.icon />}
                           <span>{item.title}</span>
-                        </a>
+                        </Link>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                   ),
