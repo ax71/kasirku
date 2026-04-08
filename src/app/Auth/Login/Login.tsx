@@ -1,6 +1,6 @@
 import { useState } from "react";
 import ModeToggle from "@/components/common/mode-toggle";
-import { INITIAL_LOGIN_FORM } from "@/constants/auth-constans";
+import { INITIAL_LOGIN_FORM } from "@/constants/auth-constant";
 import { loginSchema, type LoginForm } from "@/validations/auth-validation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
