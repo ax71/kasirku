@@ -28,15 +28,36 @@ const Login = () => {
     setLoading(true);
     setServerError(null);
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email: data.email,
-      password: data.password,
-    });
+    const { data: authData, error: authError } =
+      await supabase.auth.signInWithPassword({
+        email: data.email,
+        password: data.password,
+      });
 
-    if (error) {
-      setServerError(error.message);
-    } else {
+    if (authError) {
+      setServerError(authError.message);
+      setLoading(false);
+      return;
+    }
+
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", authData.user.id)
+      .single();
+
+    if (profileError || !profile) {
+      setServerError("Failed to fetch profile");
+      setLoading(false);
+      return;
+    }
+
+    if (profile.role === "admin") {
       navigate("/admin");
+    } else if (profile.role === "cashier") {
+      navigate("/order");
+    } else {
+      navigate("/");
     }
 
     setLoading(false);
