@@ -42,7 +42,7 @@ export const routes: RouteObject[] = [
   {
     path: "/order",
     element: (
-      <ProtectedRoute allowedRoles={["admin", "kasir"]}>
+      <ProtectedRoute allowedRoles={["admin", "cashier"]}>
         <Dashboard />
       </ProtectedRoute>
     ),

@@ -23,7 +23,7 @@ export const SIDEBAR_MENU_LIST = {
       icon: Users,
     },
   ],
-  kasir: [
+  cashier: [
     {
       title: "Order",
       url: "/order",
