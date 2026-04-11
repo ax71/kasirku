@@ -30,19 +30,11 @@ export default function FormUser<T extends FieldValues>({
   isLoading: boolean;
   type: "Create" | "Update";
   preview?: Preview;
-  setPreview?: (preview: Preview) => void;
+  setPreview?: (preview: Preview | undefined) => void;
 }) {
   return (
     <DialogContent className="sm:max-w-[425px]">
       <Form {...form}>
-        <DialogHeader>
-          <DialogTitle>{type} User </DialogTitle>
-          <DialogDescription>
-            {type === "Create"
-              ? "Register a new user here"
-              : "Make Changes user here"}
-          </DialogDescription>
-        </DialogHeader>
         <form onSubmit={onSubmit} className="space-y-4">
           <FormInput
             form={form}

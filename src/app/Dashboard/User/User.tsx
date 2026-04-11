@@ -9,6 +9,7 @@ import DataTable from "./components/data-table";
 import { getUserColumns, type UserProfile } from "@/columns/user-columns";
 import { useMemo, useState } from "react";
 import DialogCreateUser from "./components/dialog-create-user";
+import DialogUpdateUser from "./components/dialog-update-user";
 
 const UserPage = () => {
   const [selectedAction, setSelectedAction] = useState<{
@@ -63,6 +64,10 @@ const UserPage = () => {
       : 0;
   }, [users]);
 
+  const handleCloseDialog = () => {
+    setSelectedAction((prev) => ({ ...prev, type: null }));
+  };
+
   return (
     <div className="w-full">
       <div className="flex flex-col lg:flex-row mb-4 gap-2 justify-between">
@@ -90,6 +95,18 @@ const UserPage = () => {
         onChangePage={handleChangePage}
         onChangeLimit={handleChangeLimit}
       />
+      <Dialog
+        open={selectedAction.type === "update"}
+        onOpenChange={(open) => !open && handleCloseDialog()}
+      >
+        <DialogUpdateUser
+          key={selectedAction.data?.id || "update-user"}
+          refetch={refetch}
+          currentData={selectedAction.data || undefined}
+          open={selectedAction.type === "update"}
+          onOpenChange={(open) => !open && handleCloseDialog()}
+        />
+      </Dialog>
     </div>
   );
 };
