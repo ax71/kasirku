@@ -81,7 +81,10 @@ const UserPage = () => {
             <DialogTrigger asChild>
               <Button variant="outline">Create</Button>
             </DialogTrigger>
-            <DialogCreateUser refetch={refetch} />
+            <DialogCreateUser
+              refetch={refetch}
+              onOpenChange={(open) => !open && handleCloseDialog()}
+            />
           </Dialog>
         </div>
       </div>

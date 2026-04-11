@@ -1,4 +1,3 @@
-import type { AuthFormState } from "@/types/auth";
 import {
   createUserSchema,
   updateUserSchema,
@@ -7,17 +6,15 @@ import supabase from "@/lib/supabase";
 import { uploadFile } from "./upload-file-service";
 import { deleteFile } from "./delete-image-service";
 
-export async function createUser(
-  prevState: AuthFormState,
-  formData: FormData,
-): Promise<AuthFormState> {
-  const validatedFields = createUserSchema.safeParse({
+export async function createUser(formData: FormData) {
+  const rowData = {
     email: formData.get("email"),
     password: formData.get("password"),
     name: formData.get("name"),
     role: formData.get("role"),
     avatar_url: formData.get("avatar_url"),
-  });
+  };
+  const validatedFields = createUserSchema.safeParse(rowData);
 
   if (!validatedFields.success) {
     return {
@@ -29,50 +26,55 @@ export async function createUser(
     };
   }
 
-  let finalAvatarUrl = "";
+  try {
+    let finalAvatarUrl = "";
+    const avatarFile = formData.get("avatar_url");
 
-  const avatarFile = formData.get("avatar_url");
+    if (avatarFile instanceof File && avatarFile.size > 0) {
+      const uploadResult = await uploadFile("images", "users", avatarFile);
 
-  if (avatarFile instanceof File && avatarFile.size > 0) {
-    const uploadResault = await uploadFile("images", "users", avatarFile);
-    if (uploadResault.status === "error") {
-      return {
-        status: "error",
-        errors: {
-          ...prevState.errors,
-          _form: ["Upload Image Failed"],
-        },
-      };
+      if (uploadResult.status === "error") {
+        throw new Error("Upload Image Failed");
+      }
+
+      finalAvatarUrl = uploadResult.data?.url || "";
     }
-    finalAvatarUrl = uploadResault.data?.url || "";
-  }
 
-  const { error } = await supabase.auth.signUp({
-    email: validatedFields.data.email,
-    password: validatedFields.data.password,
-    options: {
-      data: {
-        name: validatedFields.data.name,
-        role: validatedFields.data.role,
-        avatar_url: finalAvatarUrl,
+    const { data: authData, error: authError } = await supabase.auth.signUp({
+      email: validatedFields.data.email,
+      password: validatedFields.data.password,
+      options: {
+        data: {
+          name: validatedFields.data.name,
+          role: validatedFields.data.role,
+          avatar_url: finalAvatarUrl,
+        },
       },
-    },
-  });
+    });
 
-  if (error) {
+    if (authError) throw authError;
+    if (!authData.user) throw new Error("User Create Failed");
+
+    const { error: profileError } = await supabase.from("profiles").insert({
+      id: authData.user.id,
+      email: validatedFields.data.email,
+      name: validatedFields.data.name,
+      role: validatedFields.data.role,
+      avatar_url: finalAvatarUrl,
+    });
+
+    if (profileError) throw profileError;
+
+    return {
+      status: "success",
+    };
+  } catch (error: any) {
+    console.error("Create User Error:", error);
     return {
       status: "error",
-      errors: {
-        ...prevState.errors,
-        _form: [error.message],
-      },
+      message: error.message || "An unexpected error occurred",
     };
   }
-
-  return {
-    status: "success",
-    errors: { _form: [] },
-  };
 }
 
 export async function updateUser(formData: FormData) {
