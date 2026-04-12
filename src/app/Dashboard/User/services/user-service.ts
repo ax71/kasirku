@@ -148,3 +148,33 @@ export async function updateUser(formData: FormData) {
     };
   }
 }
+
+export async function deleteUser(formData: FormData) {
+  const id = formData.get("id") as string;
+  const avatar_url = formData.get("avatar_url") as string;
+
+  try {
+    if (avatar_url && !avatar_url.includes("default-avatar")) {
+      const deleteFileResault = await deleteFile(avatar_url);
+      if (deleteFileResault.status === "error") {
+        throw new Error(deleteFileResault.message || "Delete Image Failed");
+      }
+    }
+
+    const { error: dbError } = await supabase
+      .from("profiles")
+      .delete()
+      .eq("id", id);
+    if (dbError) throw dbError;
+
+    return {
+      status: "success",
+    };
+  } catch (error: any) {
+    console.error("Delete User Error:", error);
+    return {
+      status: "error",
+      message: error.message || "An unexpected error occurred",
+    };
+  }
+}
