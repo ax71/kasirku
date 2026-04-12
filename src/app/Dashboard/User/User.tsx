@@ -10,6 +10,7 @@ import { getUserColumns, type UserProfile } from "@/columns/user-columns";
 import { useMemo, useState } from "react";
 import DialogCreateUser from "./components/dialog-create-user";
 import DialogUpdateUser from "./components/dialog-update-user";
+import DialogDeleteUser from "./components/dialog-delete-user";
 
 const UserPage = () => {
   const [selectedAction, setSelectedAction] = useState<{
@@ -107,6 +108,18 @@ const UserPage = () => {
           refetch={refetch}
           currentData={selectedAction.data || undefined}
           open={selectedAction.type === "update"}
+          onOpenChange={(open) => !open && handleCloseDialog()}
+        />
+      </Dialog>
+      <Dialog
+        open={selectedAction.type === "delete"}
+        onOpenChange={(open) => !open && handleCloseDialog()}
+      >
+        <DialogDeleteUser
+          key={selectedAction.data?.id || "delete-user"}
+          refetch={refetch}
+          currentData={selectedAction.data || undefined}
+          open={selectedAction.type === "delete"}
           onOpenChange={(open) => !open && handleCloseDialog()}
         />
       </Dialog>
