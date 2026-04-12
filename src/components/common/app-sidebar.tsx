@@ -1,7 +1,8 @@
-import { Store } from "lucide-react";
+import { EllipsisVertical, LogOut, Store } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarHeader,
@@ -17,10 +18,22 @@ import { cn } from "@/lib/utils";
 import { Link, useLocation } from "react-router-dom";
 import { useProfile } from "@/hooks/use-auth";
 import LoadingSidebar from "./loding-sidebar";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { useIsMobile } from "@/hooks/use-mobile";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
 
 export default function AppSidebar() {
   const location = useLocation();
   const pathname = location.pathname;
+  const isMobile = useIsMobile();
 
   const { data: profile, isLoading } = useProfile();
 
@@ -70,6 +83,67 @@ export default function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuButton
+                  size="lg"
+                  className="data-[state=open]:bg-sidebar-accent data-[state=open]: text-sidebar-accent-foreground"
+                >
+                  <Avatar className="h-8 w-8 rounded-lg">
+                    <AvatarImage src={profile.avatar_url} alt={profile.name} />
+                    <AvatarFallback className="rounded-lg">
+                      {profile.name?.charAt(0)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="leading-tight">
+                    <h4 className="truncate font-medium">{profile.name}</h4>
+                    <p className="text-muted-foreground truncate text-xs capitalize">
+                      {profile.role}
+                    </p>
+                  </div>
+                  <EllipsisVertical className="ml-auto size-4" />
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                className="min-w-56 rounded-lg"
+                side={isMobile ? "bottom" : "right"}
+                align="end"
+                sideOffset={4}
+              >
+                <DropdownMenuLabel className="p-0 font-normal">
+                  <div className="flex items-center gap-2 px-1 py-1.5">
+                    <Avatar className="h-8 w-8 rounded-lg">
+                      <AvatarImage
+                        src={profile.avatar_url}
+                        alt={profile.name}
+                      />
+                      <AvatarFallback className="rounded-lg">
+                        {profile.name?.charAt(0)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="leading-tight">
+                      <h4 className="truncate font-medium">{profile.name}</h4>
+                      <p className="text-muted-foreground truncate text-xs capitalize">
+                        {profile.role}
+                      </p>
+                    </div>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuGroup>
+                  <DropdownMenuItem onClick={() => {}}>
+                    <LogOut />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
     </Sidebar>
   );
 }
