@@ -1,10 +1,11 @@
 import { Navigate } from "react-router-dom";
-import { useProfile } from "@/hooks/use-auth";
+import { useProfile } from "@/features/auth/hooks/use-auth";
 import LoadingSidebar from "@/components/common/loding-sidebar";
+import type { UserRole } from "@/features/auth/types";
 
 type Props = {
   children: React.ReactNode;
-  allowedRoles: string[];
+  allowedRoles: UserRole[];
 };
 
 const ProtectedRoute = ({ children, allowedRoles }: Props) => {
@@ -12,7 +13,11 @@ const ProtectedRoute = ({ children, allowedRoles }: Props) => {
 
   if (isLoading) return <LoadingSidebar />;
 
-  if (!allowedRoles.includes(profile.role)) {
+  if (!profile) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (!allowedRoles.includes(profile.role as UserRole)) {
     return <Navigate to="/order" replace />;
   }
 

@@ -8,11 +8,6 @@ const Home = () => {
 
   const features = [
     {
-      title: "Manajemen Inventori",
-      desc: "Pantau stok barang secara real-time dengan notifikasi otomatis.",
-      icon: <Store className="w-6 h-6 text-primary" />,
-    },
-    {
       title: "Laporan Penjualan",
       desc: "Analisa keuntungan dan tren penjualan dengan grafik yang mudah dipahami.",
       icon: <BarChart3 className="w-6 h-6 text-primary" />,
@@ -80,7 +75,7 @@ const Home = () => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid md:grid-cols-3 lg:grid-cols-3 gap-8">
             {features.map((feature, i) => (
               <div
                 key={i}
