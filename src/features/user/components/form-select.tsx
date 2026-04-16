@@ -23,7 +23,7 @@ export default function FormSelect<T extends FieldValues>({
   label,
   selectItem,
 }: {
-  form: UseFormReturn<T>;
+  form: UseFormReturn<T, any, any>;
   name: Path<T>;
   label: string;
   placeholder?: string;
@@ -31,26 +31,31 @@ export default function FormSelect<T extends FieldValues>({
 }) {
   return (
     <FormField
-      control={form.control}
+      control={form.control as any}
       name={name}
-      render={({ field: { onChange, ...rest } }) => (
+      render={({ field }) => (
         <FormItem>
           <FormLabel>{label}</FormLabel>
           <FormControl>
-            <Select {...rest} onValueChange={onChange}>
+            <Select
+              onValueChange={field.onChange}
+              value={field.value}
+              disabled={field.disabled}
+              name={field.name}
+            >
               <SelectTrigger
                 className={cn("w-full", {
                   "border-red-500": form.formState.errors[name]?.message,
                 })}
               >
-                <SelectValue placeholder={`Select ${label}`}></SelectValue>
+                <SelectValue placeholder={`Select ${label}`} />
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
                   <SelectLabel>{label}</SelectLabel>
                   {selectItem.map((item) => (
                     <SelectItem
-                      key={item.label}
+                      key={item.value}
                       value={item.value}
                       disabled={item.disabled}
                       className="capitalize"
