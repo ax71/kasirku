@@ -76,6 +76,29 @@ export type Database = {
           updated_at?: string;
         };
       };
+      tables: {
+        Row: {
+          id: number;
+          name: string | null;
+          status: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: number;
+          name?: string | null;
+          status?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: number;
+          name?: string | null;
+          status?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
