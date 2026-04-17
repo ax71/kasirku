@@ -1,4 +1,10 @@
-import { LayoutDashboard, ShoppingCart, SquareMenu, Users } from "lucide-react";
+import {
+  Armchair,
+  LayoutDashboard,
+  ShoppingCart,
+  SquareMenu,
+  Users,
+} from "lucide-react";
 
 export const SIDEBAR_MENU_LIST = {
   admin: [
@@ -16,6 +22,11 @@ export const SIDEBAR_MENU_LIST = {
       title: "Order",
       url: "/order",
       icon: ShoppingCart,
+    },
+    {
+      title: "Table",
+      url: "/admin/table",
+      icon: Armchair,
     },
     {
       title: "Users",
