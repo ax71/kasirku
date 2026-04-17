@@ -7,6 +7,7 @@ import MenuPage from "@/features/menu/MenuPage";
 import UsersPage from "@/features/user/UserPage";
 import OrderPage from "@/app/Order";
 import ProtectedRoute from "./protected-route";
+import TablePage from "@/features/table/TablePage";
 
 export const routes: RouteObject[] = [
   {
@@ -36,6 +37,10 @@ export const routes: RouteObject[] = [
       {
         path: "users",
         element: <UsersPage />,
+      },
+      {
+        path: "table",
+        element: <TablePage />,
       },
     ],
   },
