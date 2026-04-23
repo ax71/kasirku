@@ -5,9 +5,11 @@ import Dashboard from "@/app/Dashboard";
 import AdminPage from "@/app/Dashboard/Admin";
 import MenuPage from "@/features/menu/MenuPage";
 import UsersPage from "@/features/user/UserPage";
-import OrderPage from "@/app/Order";
 import ProtectedRoute from "./protected-route";
 import TablePage from "@/features/table/TablePage";
+import OrderManagement from "@/features/order/Order";
+import DetailOrder from "@/features/order/detailOrder/DetailOrder";
+import AddOrderItemPage from "@/features/order/detailOrder/AddOrderItemPage";
 
 export const routes: RouteObject[] = [
   {
@@ -21,7 +23,7 @@ export const routes: RouteObject[] = [
   {
     path: "/admin",
     element: (
-      <ProtectedRoute allowedRoles={["admin"]}>
+      <ProtectedRoute allowedRoles={["admin", "cashier", "kitchen"]}>
         <Dashboard />
       </ProtectedRoute>
     ),
@@ -32,29 +34,40 @@ export const routes: RouteObject[] = [
       },
       {
         path: "menu",
-        element: <MenuPage />,
+        element: (
+          <ProtectedRoute allowedRoles={["admin"]}>
+            <MenuPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "users",
-        element: <UsersPage />,
+        element: (
+          <ProtectedRoute allowedRoles={["admin"]}>
+            <UsersPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "table",
-        element: <TablePage />,
+        element: (
+          <ProtectedRoute allowedRoles={["admin"]}>
+            <TablePage />
+          </ProtectedRoute>
+        ),
       },
-    ],
-  },
-  {
-    path: "/order",
-    element: (
-      <ProtectedRoute allowedRoles={["admin", "cashier"]}>
-        <Dashboard />
-      </ProtectedRoute>
-    ),
-    children: [
+      // ─── Order routes ────────────────────────────────────────────────────────
       {
-        index: true,
-        element: <OrderPage />,
+        path: "order",
+        element: <OrderManagement />,
+      },
+      {
+        path: "order/:id",
+        element: <DetailOrder />,
+      },
+      {
+        path: "order/:id/add",
+        element: <AddOrderItemPage />,
       },
     ],
   },
