@@ -1,7 +1,7 @@
 import type { ProfileRow } from "@/types/database";
 
 /** User roles available in the system */
-export type UserRole = "admin" | "cashier";
+export type UserRole = "admin" | "cashier" | "kitchen";
 
 /**
  * Profile as used by the application (post-fetch).
