@@ -29,16 +29,7 @@ export const FILTER_MENU = [
     label: "Mains",
   },
   {
-    value: "desserts",
-    label: "Desserts",
-  },
-
-  {
     value: "beverages",
     label: "Beverages",
-  },
-  {
-    value: "pastries",
-    label: "Pastries",
   },
 ];
