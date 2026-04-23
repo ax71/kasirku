@@ -99,6 +99,73 @@ export type Database = {
           updated_at?: string;
         };
       };
+      orders: {
+        Row: {
+          id: number;
+          order_id: string | null;
+          customer_name: string | null;
+          status: string | null;
+          payment_token: string | null;
+          table_id: number | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: number;
+          order_id?: string | null;
+          customer_name?: string | null;
+          status?: string | null;
+          payment_token?: string | null;
+          table_id?: number | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: number;
+          order_id?: string | null;
+          customer_name?: string | null;
+          status?: string | null;
+          payment_token?: string | null;
+          table_id?: number | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      orders_menus: {
+        Row: {
+          id: number;
+          order_id: number | null;
+          menu_id: number | null;
+          status: string | null;
+          quantity: number | null;
+          notes: string | null;
+          nominal: number | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: number;
+          order_id?: number | null;
+          menu_id?: number | null;
+          status?: string | null;
+          quantity?: number | null;
+          notes?: string | null;
+          nominal?: number | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: number;
+          order_id?: number | null;
+          menu_id?: number | null;
+          status?: string | null;
+          quantity?: number | null;
+          notes?: string | null;
+          nominal?: number | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;

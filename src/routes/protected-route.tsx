@@ -18,7 +18,7 @@ const ProtectedRoute = ({ children, allowedRoles }: Props) => {
   }
 
   if (!allowedRoles.includes(profile.role as UserRole)) {
-    return <Navigate to="/order" replace />;
+    return <Navigate to="/admin/order" replace />;
   }
 
   return children;

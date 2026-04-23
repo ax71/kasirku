@@ -17,10 +17,7 @@ export default function CategoryTabs({
     return (
       <div className="flex gap-2 mb-4">
         {Array.from({ length: 4 }).map((_, i) => (
-          <div
-            key={i}
-            className="h-9 w-20 animate-pulse rounded-lg bg-muted"
-          />
+          <div key={i} className="h-9 w-20 animate-pulse rounded-lg bg-muted" />
         ))}
       </div>
     );
@@ -28,14 +25,6 @@ export default function CategoryTabs({
 
   return (
     <div className="flex gap-2 mb-4 overflow-x-auto pb-1">
-      <Button
-        variant={activeId === undefined ? "default" : "outline"}
-        size="sm"
-        onClick={() => onSelect(undefined)}
-        className="shrink-0 rounded-lg transition-colors duration-200"
-      >
-        Semua
-      </Button>
       {categories.map((cat) => (
         <Button
           key={cat.value}

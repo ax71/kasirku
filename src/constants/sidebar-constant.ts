@@ -20,7 +20,7 @@ export const SIDEBAR_MENU_LIST = {
     },
     {
       title: "Order",
-      url: "/order",
+      url: "/admin/order",
       icon: ShoppingCart,
     },
     {
@@ -37,7 +37,14 @@ export const SIDEBAR_MENU_LIST = {
   cashier: [
     {
       title: "Order",
-      url: "/order",
+      url: "/admin/order",
+      icon: ShoppingCart,
+    },
+  ],
+  kitchen: [
+    {
+      title: "Order",
+      url: "/admin/order",
       icon: ShoppingCart,
     },
   ],

@@ -20,4 +20,5 @@ export const INITIAL_CREATE_USER_FORM = {
 export const ROLE_LIST = [
   { value: "admin", label: "Admin" },
   { value: "cashier", label: "Cashier" },
+  { value: "kitchen", label: "Kitchen" },
 ];
