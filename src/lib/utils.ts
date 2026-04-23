@@ -14,3 +14,12 @@ export function getImageData(event: ChangeEvent<HTMLInputElement>) {
     displayUrl,
   };
 }
+
+/** Format angka ke format Rupiah, contoh: 25000 → Rp 25.000 */
+export function convertIDR(value: number): string {
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    minimumFractionDigits: 0,
+  }).format(value);
+}
