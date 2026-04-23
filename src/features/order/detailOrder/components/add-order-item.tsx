@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { FILTER_MENU } from "../../order-constants";
+import { FILTER_MENU } from "../../types/order-constants";
 import useDataTable from "@/hooks/use-data-table";
 import supabase from "@/lib/supabase";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";

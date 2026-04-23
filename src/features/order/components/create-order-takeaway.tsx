@@ -5,8 +5,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   orderTakeawayFormSchema,
   type OrderTakeawayForm,
-} from "../order-validation";
-import { INITIAL_ORDER_TAKEAWAY } from "../order-constants";
+} from "../types/order-validation";
+import { INITIAL_ORDER_TAKEAWAY } from "../types/order-constants";
 import { createOrderTakeaway } from "../services/order-service";
 import {
   DialogClose,

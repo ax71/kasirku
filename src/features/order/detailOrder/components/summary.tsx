@@ -7,11 +7,13 @@ import { convertIDR } from "@/lib/utils";
 import { useProfile } from "@/features/auth/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
-import { useMemo } from "react";
+import { useMemo, useEffect, useState } from "react";
 import type { OrderDetail, OrderMenuItem } from "../../types/order";
+import supabase from "@/lib/supabase";
+import { toast } from "sonner";
 
 interface SummaryProps {
-  order: Pick<OrderDetail, "customer_name" | "tables" | "status">;
+  order: Pick<OrderDetail, "order_id" | "customer_name" | "tables" | "status">;
   orderMenu: OrderMenuItem[];
   id: string;
   onPaymentSuccess?: () => void;
@@ -21,10 +23,77 @@ export default function Summary({
   order,
   orderMenu,
   id: _id,
-  onPaymentSuccess: _onPaymentSuccess,
+  onPaymentSuccess,
 }: SummaryProps) {
   const { grandTotal, totalPrice, tax, service } = usePricing(orderMenu);
   const { data: profile } = useProfile();
+  const [isPendingPayment, setIsPendingPayment] = useState(false);
+
+  // Load Midtrans Snap script
+  useEffect(() => {
+    const snapUrl = import.meta.env.VITE_MIDTRANS_SNAP_URL;
+    const clientKey = import.meta.env.VITE_MIDTRANS_CLIENT_KEY;
+
+    if (!snapUrl || !clientKey) return;
+
+    const script = document.createElement("script");
+    script.src = snapUrl;
+    script.setAttribute("data-client-key", clientKey);
+    script.async = true;
+
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
+
+  const handlePay = async () => {
+    setIsPendingPayment(true);
+    try {
+      const { data, error } = await supabase.functions.invoke(
+        "create-payment",
+        {
+          headers: {
+            apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
+          },
+          body: { 
+            order_id: order.order_id,
+            baseUrl: window.location.origin 
+          },
+        },
+      );
+
+      if (error) throw error;
+
+      if (data?.token) {
+        window.snap.pay(data.token, {
+          onSuccess: (result: any) => {
+            toast.success("Payment success!");
+            console.log(result);
+            onPaymentSuccess?.();
+          },
+          onPending: (result: any) => {
+            toast.info("Payment pending...");
+            console.log(result);
+          },
+          onError: (result: any) => {
+            toast.error("Payment failed!");
+            console.log(result);
+          },
+          onClose: () => {
+            toast.warning(
+              "You closed the payment popup without finishing the payment",
+            );
+          },
+        });
+      }
+    } catch (error: any) {
+      toast.error("Failed to initiate payment", { description: error.message });
+    } finally {
+      setIsPendingPayment(false);
+    }
+  };
 
   const isAllServed = useMemo(() => {
     return (
@@ -73,13 +142,21 @@ export default function Summary({
           {order.status === "process" && profile?.role !== "kitchen" && (
             <Button
               type="button"
-              disabled
-              title="Pembayaran akan diaktifkan pada fase berikutnya"
+              onClick={handlePay}
+              disabled={isPendingPayment || !isAllServed}
               className="w-full font-semibold bg-amber-500 hover:bg-amber-600 text-white cursor-pointer disabled:opacity-60"
             >
-              <Loader2 className="hidden" />
-              Pay (Coming Soon)
+              {isPendingPayment && (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
+              {isAllServed ? "Pay Now" : "Wait for all items served"}
             </Button>
+          )}
+
+          {order.status === "settled" && (
+            <div className="w-full p-3 bg-green-100 text-green-700 text-center rounded-md font-bold">
+              PAID & SETTLED
+            </div>
           )}
         </div>
       </CardContent>

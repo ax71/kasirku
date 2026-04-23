@@ -1,10 +1,20 @@
 import type { ColumnDef } from "@tanstack/react-table";
-import type { OrderMenuItem, OrderMenuStatus, OrderRow, OrderStatus } from "./types/order";
+import type {
+  OrderMenuItem,
+  OrderMenuStatus,
+  OrderRow,
+  OrderStatus,
+} from "./types/order";
 import { Ban, EllipsisVertical, Link2Icon, ScrollText } from "lucide-react";
 import { Link } from "react-router-dom";
 import { cn, convertIDR } from "@/lib/utils";
 import DropdownActions from "@/components/common/dropdown-actions";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 
 export const getOrderColumns = (
@@ -67,7 +77,10 @@ export const getOrderColumns = (
     header: "Aksi",
     cell: ({ row }) => {
       const order = row.original;
-      const table = order.tables as unknown as { id: number; name: string } | null;
+      const table = order.tables as unknown as {
+        id: number;
+        name: string;
+      } | null;
 
       const menu =
         order.status === "reserved" && profileRole !== "kitchen"
@@ -126,7 +139,10 @@ export const getOrderColumns = (
 export const getOrderItemColumns = (
   currentPage: number,
   currentLimit: number,
-  handleUpdateStatus: (payload: { itemId: number; status: OrderMenuStatus }) => void
+  handleUpdateStatus: (payload: {
+    itemId: number;
+    status: OrderMenuStatus;
+  }) => void,
 ): ColumnDef<OrderMenuItem>[] => [
   {
     id: "no",
@@ -195,7 +211,12 @@ export const getOrderItemColumns = (
     header: "Aksi",
     cell: ({ row }) => {
       const item = row.original;
-      const statusFlow: OrderMenuStatus[] = ["pending", "process", "ready", "served"];
+      const statusFlow: OrderMenuStatus[] = [
+        "pending",
+        "process",
+        "ready",
+        "served",
+      ];
       const currentStatusIndex = statusFlow.indexOf(item.status);
       const nextStatus =
         currentStatusIndex >= 0 && currentStatusIndex < statusFlow.length - 1
@@ -225,7 +246,7 @@ export const getOrderItemColumns = (
                 }
                 className="capitalize cursor-pointer"
               >
-                Set as {nextStatus}
+                {nextStatus}
               </DropdownMenuItem>
             )}
           </DropdownMenuContent>

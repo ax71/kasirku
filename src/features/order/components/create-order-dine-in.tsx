@@ -2,8 +2,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { orderFormSchema, type OrderForm } from "../order-validation";
-import { INITIAL_ORDER, STATUS_CREATE_ORDER } from "../order-constants";
+import { orderFormSchema, type OrderForm } from "../types/order-validation";
+import { INITIAL_ORDER, STATUS_CREATE_ORDER } from "../types/order-constants";
 import { createOrderDineIn } from "../services/order-service";
 import type { TableRow } from "../types/order";
 import {
