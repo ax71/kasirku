@@ -14,7 +14,7 @@ export default function DropdownActions({
     label: string | React.ReactNode;
     variant?: "default" | "destructive";
     type?: "button" | "link";
-    action: () => void;
+    action?: () => void;
   }[];
 }) {
   return (

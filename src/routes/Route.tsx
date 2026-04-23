@@ -10,6 +10,7 @@ import TablePage from "@/features/table/TablePage";
 import OrderManagement from "@/features/order/Order";
 import DetailOrder from "@/features/order/detailOrder/DetailOrder";
 import AddOrderItemPage from "@/features/order/detailOrder/AddOrderItemPage";
+import PaymentStatusPage from "@/features/order/payment-status/Payment-status";
 
 export const routes: RouteObject[] = [
   {
@@ -68,6 +69,10 @@ export const routes: RouteObject[] = [
       {
         path: "order/:id/add",
         element: <AddOrderItemPage />,
+      },
+      {
+        path: "order/payment-status",
+        element: <PaymentStatusPage />,
       },
     ],
   },

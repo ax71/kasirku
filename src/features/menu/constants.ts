@@ -19,12 +19,4 @@ export const CATEGORY_LIST = [
     value: "mains",
     label: "Mains",
   },
-  {
-    value: "desserts",
-    label: "Desserts",
-  },
-  {
-    value: "pastries",
-    label: "Pastries",
-  },
 ];
