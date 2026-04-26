@@ -27,7 +27,7 @@ export default function PaymentStatusPage() {
         </>
       )}
       <Button asChild>
-        <Link to="/admin/order">Back to Orders</Link>
+        <Link to="/order">Back to Orders</Link>
       </Button>
     </div>
   );
