@@ -24,7 +24,7 @@ export const routes: RouteObject[] = [
   {
     path: "/admin",
     element: (
-      <ProtectedRoute allowedRoles={["admin", "cashier", "kitchen"]}>
+      <ProtectedRoute allowedRoles={["admin"]}>
         <Dashboard />
       </ProtectedRoute>
     ),
@@ -35,43 +35,40 @@ export const routes: RouteObject[] = [
       },
       {
         path: "menu",
-        element: (
-          <ProtectedRoute allowedRoles={["admin"]}>
-            <MenuPage />
-          </ProtectedRoute>
-        ),
+        element: <MenuPage />,
       },
       {
         path: "users",
-        element: (
-          <ProtectedRoute allowedRoles={["admin"]}>
-            <UsersPage />
-          </ProtectedRoute>
-        ),
+        element: <UsersPage />,
       },
       {
         path: "table",
-        element: (
-          <ProtectedRoute allowedRoles={["admin"]}>
-            <TablePage />
-          </ProtectedRoute>
-        ),
+        element: <TablePage />,
       },
-      // ─── Order routes ────────────────────────────────────────────────────────
+    ],
+  },
+  {
+    path: "/order",
+    element: (
+      <ProtectedRoute allowedRoles={["admin", "cashier", "kitchen"]}>
+        <Dashboard />
+      </ProtectedRoute>
+    ),
+    children: [
       {
-        path: "order",
+        index: true,
         element: <OrderManagement />,
       },
       {
-        path: "order/:id",
+        path: ":id",
         element: <DetailOrder />,
       },
       {
-        path: "order/:id/add",
+        path: ":id/add",
         element: <AddOrderItemPage />,
       },
       {
-        path: "order/payment-status",
+        path: "payment-status",
         element: <PaymentStatusPage />,
       },
     ],
