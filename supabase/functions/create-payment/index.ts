@@ -79,9 +79,9 @@ serve(async (req) => {
           first_name: order.customer_name,
         },
         callbacks: {
-          finish: `${baseUrl}/admin/order/payment-status?status=success&order_id=${order_id}`,
-          error: `${baseUrl}/admin/order/payment-status?status=error&order_id=${order_id}`,
-          pending: `${baseUrl}/admin/order/payment-status?status=pending&order_id=${order_id}`
+          finish: `${baseUrl}/order/payment-status?status=success&order_id=${order_id}`,
+          error: `${baseUrl}/order/payment-status?status=error&order_id=${order_id}`,
+          pending: `${baseUrl}/order/payment-status?status=pending&order_id=${order_id}`
         },
         custom_field1: order.id 
       }),
