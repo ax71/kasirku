@@ -5,7 +5,7 @@ const AdminPage = () => {
   const { data: profile } = useProfile();
 
   if (profile?.role !== "admin") {
-    return <Navigate to="/admin/order" replace />;
+    return <Navigate to="/order" replace />;
   }
 
   return <div>Welcome to Admin Page</div>;
