@@ -120,7 +120,7 @@ export const getOrderColumns = (
               {
                 label: (
                   <Link
-                    to={`/admin/order/${order.order_id}`}
+                    to={`/order/${order.order_id}`}
                     className="flex items-center gap-2"
                   >
                     <ScrollText className="size-4" />
