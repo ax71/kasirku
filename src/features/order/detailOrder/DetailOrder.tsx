@@ -60,7 +60,10 @@ export default function DetailOrder() {
         .select("*, menus(id, name, image_url, price)", { count: "exact" })
         .eq("order_id", order?.id ?? 0)
         .order("status")
-        .range((currentPage - 1) * currentLimit, currentPage * currentLimit - 1);
+        .range(
+          (currentPage - 1) * currentLimit,
+          currentPage * currentLimit - 1,
+        );
 
       if (error) throw error;
       return {
@@ -117,11 +120,7 @@ export default function DetailOrder() {
 
   const columns = useMemo(
     () =>
-      getOrderItemColumns(
-        currentPage,
-        currentLimit,
-        handleUpdateItemStatus,
-      ),
+      getOrderItemColumns(currentPage, currentLimit, handleUpdateItemStatus),
     [currentPage, currentLimit, handleUpdateItemStatus],
   );
 
@@ -142,9 +141,7 @@ export default function DetailOrder() {
     return (
       <div className="flex flex-col items-center justify-center h-[50vh] gap-4">
         <h2 className="text-xl font-bold">Pesanan tidak ditemukan.</h2>
-        <Button onClick={() => navigate("/admin/order")}>
-          Kembali ke Daftar
-        </Button>
+        <Button onClick={() => navigate("/order")}>Kembali ke Daftar</Button>
       </div>
     );
   }
@@ -161,7 +158,7 @@ export default function DetailOrder() {
           <Button
             variant="outline"
             size="icon"
-            onClick={() => navigate("/admin/order")}
+            onClick={() => navigate("/order")}
           >
             <ArrowLeft className="w-4 h-4" />
           </Button>
@@ -173,9 +170,7 @@ export default function DetailOrder() {
 
         <div className="flex gap-2">
           {profile?.role !== "kitchen" && order.status === "process" && (
-            <Button
-              onClick={() => navigate(`/admin/order/${order.order_id}/add`)}
-            >
+            <Button onClick={() => navigate(`/order/${order.order_id}/add`)}>
               Add Order Item
             </Button>
           )}

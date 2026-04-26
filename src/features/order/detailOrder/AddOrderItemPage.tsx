@@ -3,10 +3,6 @@ import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import AddOrderItem from "./components/add-order-item";
 
-/**
- * Page wrapper untuk menambah item ke order yang sudah ada.
- * Route: /admin/order/:id/add
- */
 export default function AddOrderItemPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -15,9 +11,7 @@ export default function AddOrderItemPage() {
     return (
       <div className="flex flex-col items-center justify-center h-[50vh] gap-4">
         <p className="text-xl font-bold">Order ID tidak ditemukan.</p>
-        <Button onClick={() => navigate("/admin/order")}>
-          Kembali ke Daftar
-        </Button>
+        <Button onClick={() => navigate("/order")}>Kembali ke Daftar</Button>
       </div>
     );
   }
@@ -28,7 +22,7 @@ export default function AddOrderItemPage() {
         <Button
           variant="outline"
           size="icon"
-          onClick={() => navigate(`/admin/order/${id}`)}
+          onClick={() => navigate(`/order/${id}`)}
         >
           <ArrowLeft className="w-4 h-4" />
         </Button>
