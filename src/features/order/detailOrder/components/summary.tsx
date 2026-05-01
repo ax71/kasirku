@@ -57,9 +57,9 @@ export default function Summary({
           headers: {
             apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
           },
-          body: { 
+          body: {
             order_id: order.order_id,
-            baseUrl: window.location.origin 
+            baseUrl: window.location.origin,
           },
         },
       );
