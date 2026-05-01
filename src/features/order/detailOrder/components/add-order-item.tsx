@@ -126,7 +126,7 @@ export default function AddOrderItem({ id }: AddOrderItemProps) {
     }
   };
 
-  const { mutate: submitOrder, isPending: isSubmitting } = useMutation({
+  const { mutateAsync: submitOrder, isPending: isSubmitting } = useMutation({
     mutationFn: () => {
       if (!order?.id) throw new Error("Order tidak ditemukan");
 
@@ -216,7 +216,10 @@ export default function AddOrderItem({ id }: AddOrderItemProps) {
           setCarts={setCarts}
           onAddToCart={handleAddToCart}
           isLoading={isSubmitting}
-          onOrder={() => submitOrder()}
+          onOrder={async () => {
+            await submitOrder();
+            return { id };
+          }}
         />
       </div>
     </div>

@@ -3,7 +3,7 @@ import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import useDataTable from "@/hooks/use-data-table";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Package, Utensils } from "lucide-react";
+import { Package, Search, Utensils } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import {
@@ -138,12 +138,16 @@ export default function OrderManagement() {
   return (
     <div className="w-full">
       <div className="flex flex-col lg:flex-row mb-4 gap-2 justify-between">
-        <p className="text-2xl font-bold">Order Management</p>
+        <p className="text-xl font-semibold">Order Management</p>
         <div className="flex gap-2">
-          <Input
-            placeholder="Search..."
-            onChange={(e) => handleChangeSearch(e.target.value)}
-          />
+          <div className="relative">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search..."
+              className="pl-8 sm:w-[250px]"
+              onChange={(e) => handleChangeSearch(e.target.value)}
+            />
+          </div>
           {profile?.role !== "kitchen" && (
             <DropdownMenu
               open={openCreatedOrder}

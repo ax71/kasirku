@@ -9,18 +9,22 @@ import { Loader2 } from "lucide-react";
 import type { MenuItem } from "@/features/menu/types";
 import type { CartItem } from "../../types/order";
 import type { Dispatch, SetStateAction } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface CardSectionProps {
-  order: {
-    customer_name: string;
-    tables: { name: string } | null;
-    status: string;
-  } | null | undefined;
+  order:
+    | {
+        customer_name: string;
+        tables: { name: string } | null;
+        status: string;
+      }
+    | null
+    | undefined;
   carts: CartItem[];
   setCarts: Dispatch<SetStateAction<CartItem[]>>;
   onAddToCart: (item: MenuItem, type: "increment" | "decrement") => void;
   isLoading: boolean;
-  onOrder: () => void;
+  onOrder: () => Promise<any>;
 }
 
 export default function CardSection({
@@ -32,13 +36,21 @@ export default function CardSection({
   onOrder,
 }: CardSectionProps) {
   const debounce = useDebounce();
+  const navigate = useNavigate();
 
   const handleAddNote = (menuId: number, notes: string) => {
     setCarts((prev) =>
-      prev.map((item) =>
-        item.menu_id === menuId ? { ...item, notes } : item,
-      ),
+      prev.map((item) => (item.menu_id === menuId ? { ...item, notes } : item)),
     );
+  };
+
+  const handleOrder = async () => {
+    try {
+      const { id } = await onOrder();
+      navigate(`/order/${id}`);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -53,10 +65,7 @@ export default function CardSection({
             </div>
             <div className="space-y-2">
               <Label>Table</Label>
-              <Input
-                value={order.tables?.name ?? "Takeaway"}
-                disabled
-              />
+              <Input value={order.tables?.name ?? "Takeaway"} disabled />
             </div>
           </div>
         )}
@@ -126,7 +135,7 @@ export default function CardSection({
           )}
           <Button
             type="button"
-            onClick={onOrder}
+            onClick={handleOrder}
             disabled={carts.length === 0 || isLoading}
             className="w-full font-semibold bg-amber-500 hover:bg-amber-600 cursor-pointer text-white"
           >

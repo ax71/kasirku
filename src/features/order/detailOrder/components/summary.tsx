@@ -155,7 +155,7 @@ export default function Summary({
 
           {order.status === "settled" && (
             <div className="w-full p-3 bg-green-100 text-green-700 text-center rounded-md font-bold">
-              PAID & SETTLED
+              Settled
             </div>
           )}
         </div>

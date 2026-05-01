@@ -171,7 +171,7 @@ export default function DetailOrder() {
         <div className="flex gap-2">
           {profile?.role !== "kitchen" && order.status === "process" && (
             <Button onClick={() => navigate(`/order/${order.order_id}/add`)}>
-              Add Order Item
+              Add Order
             </Button>
           )}
 

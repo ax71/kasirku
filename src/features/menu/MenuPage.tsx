@@ -58,14 +58,14 @@ const MenuPage = () => {
           <div className="relative">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Cari menu..."
+              placeholder="Search..."
               className="pl-8 sm:w-[250px]"
               onChange={(e) => handleChangeSearch(e.target.value)}
             />
           </div>
           <Dialog>
             <DialogTrigger asChild>
-              <Button variant="outline">Tambah Menu</Button>
+              <Button variant="outline">Create</Button>
             </DialogTrigger>
             <DialogCreateMenu
               onOpenChange={(open) => !open && handleCloseDialog()}

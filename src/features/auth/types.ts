@@ -12,4 +12,3 @@ export type Profile = Omit<ProfileRow, "role"> & {
   role: UserRole;
   email?: string;
 };
-

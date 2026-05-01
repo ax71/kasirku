@@ -4,7 +4,7 @@ import Home from "../app/Home";
 import Dashboard from "@/app/Dashboard";
 import AdminPage from "@/features/admin";
 import MenuPage from "@/features/menu/MenuPage";
-import UsersPage from "@/features/user/UserPage";
+import UsersPage from "@/features/user/User";
 import ProtectedRoute from "./protected-route";
 import TablePage from "@/features/table/TablePage";
 import OrderManagement from "@/features/order/Order";
