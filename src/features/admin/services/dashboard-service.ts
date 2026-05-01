@@ -1,5 +1,7 @@
 import supabase from "@/lib/supabase";
 
+// ── Interfaces ────────────────────────────────────────────────────────
+
 export interface DashboardStats {
   totalRevenue: number;
   totalOrders: number;
@@ -21,6 +23,28 @@ export interface RecentOrder {
   total_nominal: number;
 }
 
+export interface TopProduct {
+  id: number;
+  name: string;
+  total_quantity: number;
+  revenue: number;
+  image_url: string | null;
+}
+
+// ── Internal join types (menggantikan `as any`) ────────────────────────
+
+interface OrderMenuNominal {
+  nominal: number;
+}
+
+interface MenuJoin {
+  id: number;
+  name: string;
+  image_url: string | null;
+}
+
+// ── Service Functions ─────────────────────────────────────────────────
+
 export async function getDashboardStats(): Promise<DashboardStats> {
   const now = new Date();
   const startOfDay = new Date(
@@ -29,49 +53,63 @@ export async function getDashboardStats(): Promise<DashboardStats> {
     now.getDate(),
   ).toISOString();
 
-  const { data: revenueData, error: revenueError } = await supabase
-    .from("orders")
-    .select("id, orders_menus(nominal)")
-    .gte("created_at", startOfDay)
-    .in("status", ["paid", "settled", "completed"]);
+  // Jalankan semua query secara paralel dengan Promise.all
+  const [revenueResult, ordersResult, tablesResult, menusResult] =
+    await Promise.all([
+      supabase
+        .from("orders")
+        .select("id, orders_menus(nominal)")
+        .gte("created_at", startOfDay)
+        .in("status", ["paid", "settled", "completed"]) as unknown as Promise<{
+          data: Array<{ id: number; orders_menus: Array<{ nominal: number }> }> | null;
+          error: { message: string } | null;
+        }>,
 
-  if (revenueError) throw new Error(revenueError.message);
+      supabase
+        .from("orders")
+        .select("*", { count: "exact", head: true })
+        .gte("created_at", startOfDay) as unknown as Promise<{
+          count: number | null;
+          data: null;
+          error: { message: string } | null;
+        }>,
+
+      supabase
+        .from("tables")
+        .select("*", { count: "exact", head: true })
+        .eq("status", "occupied") as unknown as Promise<{
+          count: number | null;
+          data: null;
+          error: { message: string } | null;
+        }>,
+
+      supabase
+        .from("menus")
+        .select("*", { count: "exact", head: true }) as unknown as Promise<{
+          count: number | null;
+          data: null;
+          error: { message: string } | null;
+        }>,
+    ]);
+
+  if (revenueResult.error) throw new Error(revenueResult.error.message);
+  if (ordersResult.error) throw new Error(ordersResult.error.message);
+  if (tablesResult.error) throw new Error(tablesResult.error.message);
+  if (menusResult.error) throw new Error(menusResult.error.message);
 
   const totalRevenue =
-    revenueData?.reduce((acc, order) => {
-      const menus = order.orders_menus as unknown as
-        | { nominal: number }[]
-        | null;
+    revenueResult.data?.reduce((acc, order) => {
+      const menus = order.orders_menus as unknown as OrderMenuNominal[] | null;
       const orderTotal =
         menus?.reduce((sum, item) => sum + (item.nominal || 0), 0) || 0;
       return acc + orderTotal;
     }, 0) || 0;
 
-  const { count: totalOrders, error: ordersError } = await supabase
-    .from("orders")
-    .select("*", { count: "exact", head: true })
-    .gte("created_at", startOfDay);
-
-  if (ordersError) throw new Error(ordersError.message);
-
-  const { count: occupiedTables, error: tablesError } = await supabase
-    .from("tables")
-    .select("*", { count: "exact", head: true })
-    .eq("status", "occupied");
-
-  if (tablesError) throw new Error(tablesError.message);
-
-  const { count: totalMenus, error: menusError } = await supabase
-    .from("menus")
-    .select("*", { count: "exact", head: true });
-
-  if (menusError) throw new Error(menusError.message);
-
   return {
     totalRevenue,
-    totalOrders: totalOrders || 0,
-    occupiedTables: occupiedTables || 0,
-    totalMenus: totalMenus || 0,
+    totalOrders: ordersResult.count || 0,
+    occupiedTables: tablesResult.count || 0,
+    totalMenus: menusResult.count || 0,
   };
 }
 
@@ -82,48 +120,58 @@ export async function getRecentOrders(): Promise<RecentOrder[]> {
       "id, order_id, customer_name, status, created_at, orders_menus(nominal)",
     )
     .order("created_at", { ascending: false })
-    .limit(5);
+    .limit(5) as unknown as {
+    data: Array<{
+      id: number;
+      order_id: string;
+      customer_name: string;
+      status: string;
+      created_at: string;
+      orders_menus: Array<{ nominal: number }>;
+    }> | null;
+    error: { message: string } | null;
+  };
 
   if (error) throw new Error(error.message);
 
   return (data || []).map((order) => {
-    const menus = order.orders_menus as unknown as { nominal: number }[] | null;
+    const menus = order.orders_menus as unknown as OrderMenuNominal[] | null;
     const total_nominal =
       menus?.reduce((sum, item) => sum + (item.nominal || 0), 0) || 0;
 
     return {
       id: order.id,
       order_id: order.order_id || "",
-      customer_name: order.customer_name || "Guest",
-      status: order.status || "unknown",
+      customer_name: order.customer_name,
+      status: order.status,
       created_at: order.created_at,
       total_nominal,
     };
   });
 }
 
-export interface TopProduct {
-  id: number;
-  name: string;
-  total_quantity: number;
-  revenue: number;
-  image_url: string | null;
-}
-
 export async function getTopSellingProducts(): Promise<TopProduct[]> {
-  // Ambil semua item menu dari order yang sudah dibayar
   const { data, error } = await supabase
     .from("orders_menus")
-    .select("quantity, nominal, menu_id, menus(id, name, image_url), orders!inner(status)")
-    .in("orders.status", ["paid", "settled", "completed"]);
+    .select(
+      "quantity, nominal, menu_id, menus(id, name, image_url), orders!inner(status)",
+    )
+    .in("orders.status", ["paid", "settled", "completed"]) as unknown as {
+    data: Array<{
+      quantity: number;
+      nominal: number;
+      menu_id: number;
+      menus: MenuJoin | null;
+    }> | null;
+    error: { message: string } | null;
+  };
 
   if (error) throw new Error(error.message);
 
-  // Agregasi berdasarkan menu_id
   const aggregation: Record<number, TopProduct> = {};
 
   data?.forEach((item) => {
-    const menu = item.menus as any;
+    const menu = item.menus as MenuJoin | null;
     if (!menu) return;
 
     if (!aggregation[menu.id]) {
@@ -140,7 +188,6 @@ export async function getTopSellingProducts(): Promise<TopProduct[]> {
     aggregation[menu.id].revenue += item.nominal || 0;
   });
 
-  // Sort berdasarkan quantity terbanyak dan ambil 5 teratas
   return Object.values(aggregation)
     .sort((a, b) => b.total_quantity - a.total_quantity)
     .slice(0, 5);
@@ -156,30 +203,51 @@ export async function getSalesChartData(): Promise<ChartData[]> {
     .from("orders")
     .select("created_at, orders_menus(nominal)")
     .gte("created_at", sevenDaysAgo.toISOString())
-    .in("status", ["paid", "settled", "completed"]);
+    .in("status", ["paid", "settled", "completed"]) as unknown as {
+    data: Array<{
+      created_at: string;
+      orders_menus: Array<{ nominal: number }>;
+    }> | null;
+    error: { message: string } | null;
+  };
 
   if (error) throw new Error(error.message);
 
-  const days: Record<string, number> = {};
+  // Gunakan format date lokal YYYY-MM-DD agar konsisten dengan hari yang ditampilkan
+  const days: Record<string, { label: string; revenue: number }> = {};
+
   for (let i = 0; i < 7; i++) {
     const date = new Date(sevenDaysAgo);
     date.setDate(sevenDaysAgo.getDate() + i);
-    const dayName = date.toLocaleDateString("id-ID", { weekday: "short" });
-    days[dayName] = 0;
+    
+    // Format YYYY-MM-DD secara manual dari local time
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const localKey = `${year}-${month}-${day}`;
+    
+    const label = date.toLocaleDateString("id-ID", { weekday: "short" });
+    days[localKey] = { label, revenue: 0 };
   }
 
   orderData?.forEach((order) => {
-    const dayName = new Date(order.created_at).toLocaleDateString("id-ID", {
-      weekday: "short",
-    });
-    const menus = order.orders_menus as unknown as { nominal: number }[] | null;
-    const orderTotal =
-      menus?.reduce((sum, item) => sum + (item.nominal || 0), 0) || 0;
+    const d = new Date(order.created_at);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    const localKey = `${year}-${month}-${day}`;
 
-    if (days[dayName] !== undefined) {
-      days[dayName] += orderTotal;
+    if (days[localKey] !== undefined) {
+      const menus = order.orders_menus as unknown as OrderMenuNominal[] | null;
+      const orderTotal =
+        menus?.reduce((sum, item) => sum + (item.nominal || 0), 0) || 0;
+      days[localKey].revenue += orderTotal;
     }
   });
 
-  return Object.entries(days).map(([day, revenue]) => ({ day, revenue }));
+  // Map ke format output, gunakan label hari sebagai tampilan
+  return Object.values(days).map(({ label, revenue }) => ({
+    day: label,
+    revenue,
+  }));
 }
