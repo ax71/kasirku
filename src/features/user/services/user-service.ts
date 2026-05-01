@@ -1,6 +1,7 @@
 import supabase from "@/lib/supabase";
 import { uploadFile } from "./upload-file-service";
 import { deleteFile } from "./delete-image-service";
+import type { Profile } from "@/features/auth/types";
 
 export interface CreateUserInput {
   email: string;
@@ -32,13 +33,6 @@ export interface GetUsersParams {
 export interface GetUsersResult {
   data: Profile[];
   count: number;
-}
-
-interface Profile {
-  id: string;
-  name: string;
-  role: string;
-  avatar_url: string;
 }
 
 export async function getUsers(

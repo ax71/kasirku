@@ -10,6 +10,7 @@ import DialogUpdateUser from "./components/dialog-update-user";
 import DialogDeleteUser from "./components/dialog-delete-user";
 import type { Profile } from "@/features/auth/types";
 import { useUsersQuery } from "./hooks/use-users-query";
+import { Search } from "lucide-react";
 
 const UserPage = () => {
   const [selectedAction, setSelectedAction] = useState<{
@@ -48,10 +49,14 @@ const UserPage = () => {
       <div className="flex flex-col lg:flex-row mb-4 gap-2 justify-between">
         <p className="text-xl font-semibold">User Management</p>
         <div className="flex gap-2">
-          <Input
-            placeholder="Search..."
-            onChange={(e) => handleChangeSearch(e.target.value)}
-          />
+          <div className="relative">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search..."
+              className="pl-8 sm:w-[250px]"
+              onChange={(e) => handleChangeSearch(e.target.value)}
+            />
+          </div>
           <Dialog>
             <DialogTrigger asChild>
               <Button variant="outline">Create</Button>
@@ -99,4 +104,3 @@ const UserPage = () => {
 };
 
 export default UserPage;
-
