@@ -90,8 +90,8 @@ export default function OrderManagement() {
         "postgres_changes",
         { event: "*", schema: "public", table: "orders" },
         () => {
-          refetchOrders();
-          refetchTables();
+          queryClient.invalidateQueries({ queryKey: ["orders"] });
+          queryClient.invalidateQueries({ queryKey: ["tables"] });
         },
       )
       .subscribe();
@@ -99,7 +99,7 @@ export default function OrderManagement() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [queryClient]);
 
   const totalPages = useMemo(() => {
     return orders && orders.count !== null

@@ -78,8 +78,9 @@ export default function DetailOrder() {
   useEffect(() => {
     if (!order?.id) return;
 
-    const channel = supabase
-      .channel("change-order-detail")
+    // Subscribe ke changes di orders_menus (untuk update list item)
+    const menuChannel = supabase
+      .channel("change-order-detail-menu")
       .on(
         "postgres_changes",
         {
@@ -90,13 +91,30 @@ export default function DetailOrder() {
         },
         () => {
           refetchOrderMenu();
+        },
+      )
+      .subscribe();
+
+    // Subscribe ke changes di orders (untuk update status order)
+    const orderChannel = supabase
+      .channel("change-order-detail-status")
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "orders",
+          filter: `id=eq.${order.id}`,
+        },
+        () => {
           queryClient.invalidateQueries({ queryKey: ["order", id] });
         },
       )
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      supabase.removeChannel(menuChannel);
+      supabase.removeChannel(orderChannel);
     };
   }, [order?.id, id, queryClient, refetchOrderMenu]);
 

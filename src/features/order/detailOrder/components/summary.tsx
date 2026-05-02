@@ -11,6 +11,7 @@ import { useMemo, useEffect, useState } from "react";
 import type { OrderDetail, OrderMenuItem } from "../../types/order";
 import supabase from "@/lib/supabase";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 interface SummaryProps {
   order: Pick<OrderDetail, "order_id" | "customer_name" | "tables" | "status">;
@@ -28,6 +29,7 @@ export default function Summary({
   const { grandTotal, totalPrice, tax, service } = usePricing(orderMenu);
   const { data: profile } = useProfile();
   const [isPendingPayment, setIsPendingPayment] = useState(false);
+  const navigate = useNavigate();
 
   // Load Midtrans Snap script
   useEffect(() => {
@@ -48,8 +50,10 @@ export default function Summary({
     };
   }, []);
 
+  // Handle payment
   const handlePay = async () => {
     setIsPendingPayment(true);
+
     try {
       const { data, error } = await supabase.functions.invoke(
         "create-payment",
@@ -72,15 +76,30 @@ export default function Summary({
             toast.success("Payment success!");
             console.log(result);
             onPaymentSuccess?.();
+
+            navigate(
+              `/order/payment-status?order_id=${order.order_id}&status=success`,
+            );
           },
+
           onPending: (result: any) => {
             toast.info("Payment pending...");
             console.log(result);
+
+            navigate(
+              `/order/payment-status?order_id=${order.order_id}&status=pending`,
+            );
           },
+
           onError: (result: any) => {
             toast.error("Payment failed!");
             console.log(result);
+
+            navigate(
+              `/order/payment-status?order_id=${order.order_id}&status=error`,
+            );
           },
+
           onClose: () => {
             toast.warning(
               "You closed the payment popup without finishing the payment",
@@ -89,12 +108,15 @@ export default function Summary({
         });
       }
     } catch (error: any) {
-      toast.error("Failed to initiate payment", { description: error.message });
+      toast.error("Failed to initiate payment", {
+        description: error.message,
+      });
     } finally {
       setIsPendingPayment(false);
     }
   };
 
+  // Check semua menu sudah served
   const isAllServed = useMemo(() => {
     return (
       orderMenu.length > 0 &&
@@ -106,11 +128,13 @@ export default function Summary({
     <Card className="w-full shadow-sm">
       <CardContent className="space-y-4">
         <h3 className="text-lg font-semibold">Customer Information</h3>
+
         <div className="space-y-4">
           <div className="space-y-2">
             <Label>Name</Label>
             <Input value={order.customer_name} disabled />
           </div>
+
           <div className="space-y-2">
             <Label>Table</Label>
             <Input value={order.tables?.name ?? "Takeaway"} disabled />
@@ -121,20 +145,25 @@ export default function Summary({
 
         <div className="space-y-4">
           <h3 className="text-lg font-semibold">Order Summary</h3>
-          <div className="flex justify-between items-center text-sm">
+
+          <div className="flex justify-between text-sm">
             <p>Subtotal</p>
             <p>{convertIDR(totalPrice)}</p>
           </div>
-          <div className="flex justify-between items-center text-sm">
+
+          <div className="flex justify-between text-sm">
             <p>Tax (12%)</p>
             <p>{convertIDR(tax)}</p>
           </div>
-          <div className="flex justify-between items-center text-sm">
+
+          <div className="flex justify-between text-sm">
             <p>Service (5%)</p>
             <p>{convertIDR(service)}</p>
           </div>
+
           <Separator />
-          <div className="flex justify-between items-center">
+
+          <div className="flex justify-between">
             <p className="text-lg font-semibold">Total</p>
             <p className="text-lg font-semibold">{convertIDR(grandTotal)}</p>
           </div>
@@ -144,7 +173,7 @@ export default function Summary({
               type="button"
               onClick={handlePay}
               disabled={isPendingPayment || !isAllServed}
-              className="w-full font-semibold bg-amber-500 hover:bg-amber-600 text-white cursor-pointer disabled:opacity-60"
+              className="w-full font-semibold bg-amber-500 hover:bg-amber-600 text-white disabled:opacity-60"
             >
               {isPendingPayment && (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
