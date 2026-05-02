@@ -48,7 +48,8 @@ serve(async (req) => {
       : "https://app.sandbox.midtrans.com/snap/v1/transactions";
 
     // Gunakan baseUrl dari request (frontend) agar redirect kembali ke project yang memanggil
-    const baseUrl = requestBaseUrl || "http://localhost:5173"; 
+    // Pastikan baseUrl tidak mengandung /admin agar redirect ke path /order/payment-status benar
+    const baseUrl = (requestBaseUrl || "http://localhost:5173").replace("/admin", ""); 
 
     const authBase64 = btoa(`${serverKey}:`);
 
