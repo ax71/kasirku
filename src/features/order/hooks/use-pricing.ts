@@ -5,30 +5,12 @@ import { useMemo } from "react";
 export function usePricing(items: { nominal: number }[] | null | undefined) {
   const safeItems = items || [];
 
-  const totalPrice = useMemo(() => {
-    let total = 0;
-    safeItems.forEach((item) => {
-      total += item.nominal;
-    });
-    return total;
+  return useMemo(() => {
+    const totalPrice = safeItems.reduce((acc, item) => acc + item.nominal, 0);
+    const tax = Math.round(totalPrice * 0.12);
+    const service = Math.round(totalPrice * 0.05);
+    const grandTotal = totalPrice + tax + service;
+
+    return { totalPrice, tax, service, grandTotal };
   }, [safeItems]);
-
-  const tax = useMemo(() => {
-    return Math.round(totalPrice * 0.12);
-  }, [totalPrice]);
-
-  const service = useMemo(() => {
-    return Math.round(totalPrice * 0.05);
-  }, [totalPrice]);
-
-  const grandTotal = useMemo(() => {
-    return totalPrice + tax + service;
-  }, [totalPrice, tax, service]);
-
-  return {
-    totalPrice,
-    tax,
-    service,
-    grandTotal,
-  };
 }

@@ -43,6 +43,32 @@ interface MenuJoin {
   image_url: string | null;
 }
 
+interface RevenueOrder {
+  id: number;
+  orders_menus: OrderMenuNominal[] | null;
+}
+
+interface RecentOrderJoin {
+  id: number;
+  order_id: string;
+  customer_name: string;
+  status: string;
+  created_at: string;
+  orders_menus: OrderMenuNominal[] | null;
+}
+
+interface TopProductJoin {
+  quantity: number | null;
+  nominal: number | null;
+  menu_id: number | null;
+  menus: MenuJoin | null;
+}
+
+interface SalesOrderJoin {
+  created_at: string;
+  orders_menus: OrderMenuNominal[] | null;
+}
+
 // ── Service Functions ─────────────────────────────────────────────────
 
 export async function getDashboardStats(): Promise<DashboardStats> {
@@ -60,36 +86,21 @@ export async function getDashboardStats(): Promise<DashboardStats> {
         .from("orders")
         .select("id, orders_menus(nominal)")
         .gte("created_at", startOfDay)
-        .in("status", ["paid", "settled", "completed"]) as unknown as Promise<{
-          data: Array<{ id: number; orders_menus: Array<{ nominal: number }> }> | null;
-          error: { message: string } | null;
-        }>,
+        .in("status", ["paid", "settled", "completed"]),
 
       supabase
         .from("orders")
         .select("*", { count: "exact", head: true })
-        .gte("created_at", startOfDay) as unknown as Promise<{
-          count: number | null;
-          data: null;
-          error: { message: string } | null;
-        }>,
+        .gte("created_at", startOfDay),
 
       supabase
         .from("tables")
         .select("*", { count: "exact", head: true })
-        .eq("status", "occupied") as unknown as Promise<{
-          count: number | null;
-          data: null;
-          error: { message: string } | null;
-        }>,
+        .eq("status", "occupied"),
 
       supabase
         .from("menus")
-        .select("*", { count: "exact", head: true }) as unknown as Promise<{
-          count: number | null;
-          data: null;
-          error: { message: string } | null;
-        }>,
+        .select("*", { count: "exact", head: true }),
     ]);
 
   if (revenueResult.error) throw new Error(revenueResult.error.message);
@@ -97,9 +108,11 @@ export async function getDashboardStats(): Promise<DashboardStats> {
   if (tablesResult.error) throw new Error(tablesResult.error.message);
   if (menusResult.error) throw new Error(menusResult.error.message);
 
+  const revenueData = revenueResult.data as unknown as RevenueOrder[] | null;
+
   const totalRevenue =
-    revenueResult.data?.reduce((acc, order) => {
-      const menus = order.orders_menus as unknown as OrderMenuNominal[] | null;
+    revenueData?.reduce((acc, order) => {
+      const menus = order.orders_menus;
       const orderTotal =
         menus?.reduce((sum, item) => sum + (item.nominal || 0), 0) || 0;
       return acc + orderTotal;
@@ -120,22 +133,14 @@ export async function getRecentOrders(): Promise<RecentOrder[]> {
       "id, order_id, customer_name, status, created_at, orders_menus(nominal)",
     )
     .order("created_at", { ascending: false })
-    .limit(5) as unknown as {
-    data: Array<{
-      id: number;
-      order_id: string;
-      customer_name: string;
-      status: string;
-      created_at: string;
-      orders_menus: Array<{ nominal: number }>;
-    }> | null;
-    error: { message: string } | null;
-  };
+    .limit(5);
 
   if (error) throw new Error(error.message);
 
-  return (data || []).map((order) => {
-    const menus = order.orders_menus as unknown as OrderMenuNominal[] | null;
+  const recentOrdersData = data as unknown as RecentOrderJoin[] | null;
+
+  return (recentOrdersData || []).map((order) => {
+    const menus = order.orders_menus;
     const total_nominal =
       menus?.reduce((sum, item) => sum + (item.nominal || 0), 0) || 0;
 
@@ -156,26 +161,20 @@ export async function getTopSellingProducts(): Promise<TopProduct[]> {
     .select(
       "quantity, nominal, menu_id, menus(id, name, image_url), orders!inner(status)",
     )
-    .in("orders.status", ["paid", "settled", "completed"]) as unknown as {
-    data: Array<{
-      quantity: number;
-      nominal: number;
-      menu_id: number;
-      menus: MenuJoin | null;
-    }> | null;
-    error: { message: string } | null;
-  };
+    .in("orders.status", ["paid", "settled", "completed"]);
 
   if (error) throw new Error(error.message);
 
   const aggregation: Record<number, TopProduct> = {};
 
-  data?.forEach((item) => {
-    const menu = item.menus as MenuJoin | null;
-    if (!menu) return;
+  const topProductsData = data as unknown as TopProductJoin[] | null;
 
-    if (!aggregation[menu.id]) {
-      aggregation[menu.id] = {
+  topProductsData?.forEach((item) => {
+    const menu = item.menus as MenuJoin | null;
+    if (!menu || !item.menu_id) return;
+
+    if (!aggregation[item.menu_id]) {
+      aggregation[item.menu_id] = {
         id: menu.id,
         name: menu.name,
         total_quantity: 0,
@@ -184,8 +183,8 @@ export async function getTopSellingProducts(): Promise<TopProduct[]> {
       };
     }
 
-    aggregation[menu.id].total_quantity += item.quantity || 0;
-    aggregation[menu.id].revenue += item.nominal || 0;
+    aggregation[item.menu_id].total_quantity += item.quantity || 0;
+    aggregation[item.menu_id].revenue += item.nominal || 0;
   });
 
   return Object.values(aggregation)
@@ -203,13 +202,7 @@ export async function getSalesChartData(): Promise<ChartData[]> {
     .from("orders")
     .select("created_at, orders_menus(nominal)")
     .gte("created_at", sevenDaysAgo.toISOString())
-    .in("status", ["paid", "settled", "completed"]) as unknown as {
-    data: Array<{
-      created_at: string;
-      orders_menus: Array<{ nominal: number }>;
-    }> | null;
-    error: { message: string } | null;
-  };
+    .in("status", ["paid", "settled", "completed"]);
 
   if (error) throw new Error(error.message);
 
@@ -230,7 +223,9 @@ export async function getSalesChartData(): Promise<ChartData[]> {
     days[localKey] = { label, revenue: 0 };
   }
 
-  orderData?.forEach((order) => {
+  const salesOrdersData = orderData as unknown as SalesOrderJoin[] | null;
+
+  salesOrdersData?.forEach((order) => {
     const d = new Date(order.created_at);
     const year = d.getFullYear();
     const month = String(d.getMonth() + 1).padStart(2, "0");
@@ -238,7 +233,7 @@ export async function getSalesChartData(): Promise<ChartData[]> {
     const localKey = `${year}-${month}-${day}`;
 
     if (days[localKey] !== undefined) {
-      const menus = order.orders_menus as unknown as OrderMenuNominal[] | null;
+      const menus = order.orders_menus;
       const orderTotal =
         menus?.reduce((sum, item) => sum + (item.nominal || 0), 0) || 0;
       days[localKey].revenue += orderTotal;

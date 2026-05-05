@@ -2,8 +2,67 @@ import supabase from "@/lib/supabase";
 import type {
   CartItemInsert,
   OrderMenuStatus,
+  OrderRow,
   OrderStatus,
+  TableRow,
 } from "../types/order";
+
+// ─── Query Functions ──────────────────────────────────────────────────────────
+
+export interface OrderQueryParams {
+  page: number;
+  limit: number;
+  search: string;
+}
+
+/**
+ * Mengambil daftar orders dengan pagination dan pencarian.
+ */
+export async function getOrders(params: OrderQueryParams): Promise<{
+  data: OrderRow[];
+  count: number;
+}> {
+  const { page, limit, search } = params;
+
+  const query = supabase
+    .from("orders")
+    .select(
+      `id, order_id, customer_name, status, payment_token, tables(name, id)`,
+      { count: "exact" },
+    )
+    .range((page - 1) * limit, page * limit - 1)
+    .order("created_at");
+
+  if (search) {
+    query.or(
+      `order_id.ilike.%${search}%,customer_name.ilike.%${search}%`,
+    );
+  }
+
+  const { data, error, count } = await query;
+
+  if (error) throw new Error(error.message);
+
+  return {
+    data: (data as unknown as OrderRow[]) ?? [],
+    count: count ?? 0,
+  };
+}
+
+/**
+ * Mengambil daftar meja untuk dropdown create order.
+ */
+export async function getAvailableTables(): Promise<TableRow[]> {
+  const { data, error } = await supabase
+    .from("tables")
+    .select("*")
+    .order("created_at")
+    .order("status");
+
+  if (error) throw new Error(error.message);
+
+  return (data as TableRow[]) ?? [];
+}
 
 export interface CreateOrderDineInPayload {
   customer_name: string;
@@ -96,13 +155,6 @@ export async function updateOrderReservation(
   }
 }
 
-/**
- * Menghapus order.
- */
-export async function deleteOrder(id: number): Promise<void> {
-  const { error } = await supabase.from("orders").delete().eq("id", id);
-  if (error) throw new Error(error.message);
-}
 
 // ─── Order Menu Items ─────────────────────────────────────────────────────────
 
@@ -141,10 +193,3 @@ export async function updateOrderItemStatus(
   if (error) throw new Error(error.message);
 }
 
-/**
- * Menghapus satu item menu dari order.
- */
-export async function deleteOrderItem(id: number): Promise<void> {
-  const { error } = await supabase.from("orders_menus").delete().eq("id", id);
-  if (error) throw new Error(error.message);
-}
