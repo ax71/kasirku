@@ -1,6 +1,6 @@
 import { Navigate } from "react-router-dom";
 import { useProfile } from "@/features/auth/hooks/use-auth";
-import LoadingSidebar from "@/components/common/loding-sidebar";
+import LoadingSidebar from "@/components/common/loading-sidebar";
 import type { UserRole } from "@/features/auth/types";
 
 type Props = {

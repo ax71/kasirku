@@ -1,12 +1,12 @@
 import type { RouteObject } from "react-router-dom";
-import Login from "@/features/auth/components/LoginPage";
+import Login from "@/features/auth/components/Login";
 import Home from "../app/Home";
 import Dashboard from "@/app/Dashboard";
 import AdminPage from "@/features/admin";
-import MenuPage from "@/features/menu/MenuPage";
+import MenuPage from "@/features/menu/Menu";
 import UsersPage from "@/features/user/User";
 import ProtectedRoute from "./protected-route";
-import TablePage from "@/features/table/TablePage";
+import TablePage from "@/features/table/Table";
 import OrderManagement from "@/features/order/Order";
 import DetailOrder from "@/features/order/detailOrder/DetailOrder";
 import AddOrderItemPage from "@/features/order/detailOrder/AddOrderItemPage";
