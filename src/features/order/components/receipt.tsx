@@ -32,7 +32,7 @@ export default function Receipt({ order, orderId, orderMenu }: ReceiptProps) {
           className="w-[80mm] flex flex-col p-4 bg-white text-black font-mono"
         >
           <h4 className="text-xl font-bold text-center pb-3 border-b border-dashed border-black">
-            PC-POS RESTO
+            KasirKU
           </h4>
           <div className="py-3 border-b border-dashed border-black text-xs space-y-1">
             <p>

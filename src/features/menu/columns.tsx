@@ -2,6 +2,7 @@ import DropdownActions from "@/components/common/dropdown-actions";
 import type { MenuItem } from "./types";
 import type { ColumnDef } from "@tanstack/react-table";
 import { CATEGORY_LIST } from "./constants";
+import { convertIDR } from "@/lib/utils";
 
 type SetSelectedAction = React.Dispatch<
   React.SetStateAction<{
@@ -9,16 +10,6 @@ type SetSelectedAction = React.Dispatch<
     type: "update" | "delete" | null;
   }>
 >;
-
-/** Format number to Rupiah currency string */
-function formatRupiah(value: number): string {
-  return new Intl.NumberFormat("id-ID", {
-    style: "currency",
-    currency: "IDR",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(value);
-}
 
 export function getMenuColumns(
   setSelectedAction: SetSelectedAction,
@@ -56,7 +47,7 @@ export function getMenuColumns(
     {
       accessorKey: "price",
       header: "Harga",
-      cell: ({ row }) => formatRupiah(row.original.price),
+      cell: ({ row }) => convertIDR(row.original.price),
     },
     {
       accessorKey: "category",

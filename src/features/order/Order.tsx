@@ -18,9 +18,13 @@ import { useProfile } from "@/features/auth/hooks/use-auth";
 import DataTable from "@/features/user/components/data-table";
 import DialogCreateOrderDineIn from "./components/create-order-dine-in";
 import DialogCreateOrderTakeaway from "./components/create-order-takeaway";
-import { updateOrderReservation } from "./services/order-service";
+import {
+  getOrders,
+  getAvailableTables,
+  updateOrderReservation,
+} from "./services/order-service";
 import { getOrderColumns } from "./columns";
-import type { OrderRow, OrderStatus, TableRow } from "./types/order";
+import type { OrderStatus } from "./types/order";
 
 export default function OrderManagement() {
   const queryClient = useQueryClient();
@@ -35,51 +39,19 @@ export default function OrderManagement() {
 
   const { data: profile } = useProfile();
 
-  const {
-    data: orders,
-    isLoading,
-    refetch: refetchOrders,
-  } = useQuery({
+  const { data: orders, isLoading } = useQuery({
     queryKey: ["orders", currentPage, currentLimit, currentSearch],
-    queryFn: async () => {
-      const query = supabase
-        .from("orders")
-        .select(
-          `id, order_id, customer_name, status, payment_token, tables(name, id)`,
-          { count: "exact" },
-        )
-        .range((currentPage - 1) * currentLimit, currentPage * currentLimit - 1)
-        .order("created_at");
-
-      if (currentSearch) {
-        query.or(
-          `order_id.ilike.%${currentSearch}%,customer_name.ilike.%${currentSearch}%`,
-        );
-      }
-
-      const result = await query;
-
-      if (result.error) {
-        toast.error("Get Order data Failed", {
-          description: result.error.message,
-        });
-      }
-
-      return result;
-    },
+    queryFn: () =>
+      getOrders({
+        page: currentPage,
+        limit: currentLimit,
+        search: currentSearch,
+      }),
   });
 
-  const { data: tables, refetch: refetchTables } = useQuery({
+  const { data: tables } = useQuery({
     queryKey: ["tables"],
-    queryFn: async () => {
-      const result = await supabase
-        .from("tables")
-        .select("*")
-        .order("created_at")
-        .order("status");
-
-      return result.data as TableRow[] | null;
-    },
+    queryFn: getAvailableTables,
   });
 
   // Realtime subscription
@@ -102,9 +74,7 @@ export default function OrderManagement() {
   }, [queryClient]);
 
   const totalPages = useMemo(() => {
-    return orders && orders.count !== null
-      ? Math.ceil(orders.count / currentLimit)
-      : 0;
+    return orders?.count ? Math.ceil(orders.count / currentLimit) : 0;
   }, [orders, currentLimit]);
 
   const { mutate: handleReservation } = useMutation({
@@ -187,7 +157,7 @@ export default function OrderManagement() {
       </div>
       <DataTable
         columns={columns}
-        data={(orders?.data as OrderRow[]) ?? []}
+        data={orders?.data ?? []}
         isLoading={isLoading}
         totalPages={totalPages}
         currentPage={currentPage}

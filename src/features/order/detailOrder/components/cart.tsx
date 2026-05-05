@@ -24,7 +24,7 @@ interface CardSectionProps {
   setCarts: Dispatch<SetStateAction<CartItem[]>>;
   onAddToCart: (item: MenuItem, type: "increment" | "decrement") => void;
   isLoading: boolean;
-  onOrder: () => Promise<any>;
+  onOrder: () => Promise<{ id: string }>;
 }
 
 export default function CardSection({

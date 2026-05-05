@@ -7,11 +7,16 @@ import { convertIDR } from "@/lib/utils";
 import { useProfile } from "@/features/auth/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
-import { useMemo, useEffect, useState } from "react";
-import type { OrderDetail, OrderMenuItem } from "../../types/order";
+import { useMemo, useState } from "react";
+import type {
+  OrderDetail,
+  OrderMenuItem,
+  MidtransSnapResult,
+} from "../../types/order";
 import supabase from "@/lib/supabase";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { useMidtransSnap } from "../../hooks/use-midtrans-snap";
 
 interface SummaryProps {
   order: Pick<OrderDetail, "order_id" | "customer_name" | "tables" | "status">;
@@ -30,28 +35,15 @@ export default function Summary({
   const { data: profile } = useProfile();
   const [isPendingPayment, setIsPendingPayment] = useState(false);
   const navigate = useNavigate();
-
-  // Load Midtrans Snap script
-  useEffect(() => {
-    const snapUrl = import.meta.env.VITE_MIDTRANS_SNAP_URL;
-    const clientKey = import.meta.env.VITE_MIDTRANS_CLIENT_KEY;
-
-    if (!snapUrl || !clientKey) return;
-
-    const script = document.createElement("script");
-    script.src = snapUrl;
-    script.setAttribute("data-client-key", clientKey);
-    script.async = true;
-
-    document.body.appendChild(script);
-
-    return () => {
-      document.body.removeChild(script);
-    };
-  }, []);
+  const { isReady: isSnapReady } = useMidtransSnap();
 
   // Handle payment
   const handlePay = async () => {
+    if (!isSnapReady) {
+      toast.error("Payment SDK is not ready yet. Please try again.");
+      return;
+    }
+
     setIsPendingPayment(true);
 
     try {
@@ -72,9 +64,9 @@ export default function Summary({
 
       if (data?.token) {
         window.snap.pay(data.token, {
-          onSuccess: (result: any) => {
+          onSuccess: (result: MidtransSnapResult) => {
             toast.success("Payment success!");
-            console.log(result);
+            console.log("[Midtrans] Success:", result.transaction_status);
             onPaymentSuccess?.();
 
             navigate(
@@ -82,18 +74,18 @@ export default function Summary({
             );
           },
 
-          onPending: (result: any) => {
+          onPending: (result: MidtransSnapResult) => {
             toast.info("Payment pending...");
-            console.log(result);
+            console.log("[Midtrans] Pending:", result.transaction_status);
 
             navigate(
               `/order/payment-status?order_id=${order.order_id}&status=pending`,
             );
           },
 
-          onError: (result: any) => {
+          onError: (result: MidtransSnapResult) => {
             toast.error("Payment failed!");
-            console.log(result);
+            console.log("[Midtrans] Error:", result.transaction_status);
 
             navigate(
               `/order/payment-status?order_id=${order.order_id}&status=error`,
@@ -107,10 +99,10 @@ export default function Summary({
           },
         });
       }
-    } catch (error: any) {
-      toast.error("Failed to initiate payment", {
-        description: error.message,
-      });
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : "Unknown error occurred";
+      toast.error("Failed to initiate payment", { description: message });
     } finally {
       setIsPendingPayment(false);
     }
@@ -172,7 +164,7 @@ export default function Summary({
             <Button
               type="button"
               onClick={handlePay}
-              disabled={isPendingPayment || !isAllServed}
+              disabled={isPendingPayment || !isAllServed || !isSnapReady}
               className="w-full font-semibold bg-amber-500 hover:bg-amber-600 text-white disabled:opacity-60"
             >
               {isPendingPayment && (
