@@ -17,7 +17,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useProfile } from "@/features/auth/hooks/use-auth";
-import LoadingSidebar from "./loding-sidebar";
+import LoadingSidebar from "./loading-sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { useIsMobile } from "@/hooks/use-mobile";
 import {
